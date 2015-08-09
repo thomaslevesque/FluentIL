@@ -1,5 +1,6 @@
-﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
+<#@ import namespace="System.IO" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Reflection" #>
@@ -7,41 +8,48 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 <#
+    Generate(true);
+    SaveOutput("IFluentILGenerator.Opcodes.cs");
+    Generate(false);
+#>
+<#+
+void Generate(bool isInterface)
+{
+
     var opcodes =
         (from f in typeof(OpCodes).GetFields(BindingFlags.Public | BindingFlags.Static)
          where f.FieldType == typeof(OpCode)
          let opcode = (OpCode)f.GetValue(null)
          select new { f.Name, Code = opcode })
-		.ToLookup(o => o.Code.OperandType);
+        .ToLookup(o => o.Code.OperandType);
 
-	var primitiveOperandTypes = new List<Tuple<OperandType, string>>
-	{
-		Tuple.Create(OperandType.InlineI, "int"),
-		Tuple.Create(OperandType.InlineI8, "long"),
-		Tuple.Create(OperandType.ShortInlineI, "sbyte"),
-		Tuple.Create(OperandType.InlineR, "double"),
-		Tuple.Create(OperandType.ShortInlineR, "float"),
-		Tuple.Create(OperandType.InlineString, "string"),
-		Tuple.Create(OperandType.InlineVar, "uint"),
-		Tuple.Create(OperandType.ShortInlineVar, "byte"),
-		Tuple.Create(OperandType.InlineVar, "LocalBuilder"),
-		Tuple.Create(OperandType.ShortInlineVar, "LocalBuilder"),
-		Tuple.Create(OperandType.InlineBrTarget, "Label"),
-		Tuple.Create(OperandType.ShortInlineBrTarget, "Label"),
-		Tuple.Create(OperandType.InlineSwitch, "Label[]"),
-		Tuple.Create(OperandType.InlineType, "Type"),
-		Tuple.Create(OperandType.InlineField, "FieldInfo"),
-		Tuple.Create(OperandType.InlineMethod, "MethodInfo"),
-	};
+    var primitiveOperandTypes = new List<Tuple<OperandType, string>>
+    {
+        Tuple.Create(OperandType.InlineI, "int"),
+        Tuple.Create(OperandType.InlineI8, "long"),
+        Tuple.Create(OperandType.ShortInlineI, "sbyte"),
+        Tuple.Create(OperandType.InlineR, "double"),
+        Tuple.Create(OperandType.ShortInlineR, "float"),
+        Tuple.Create(OperandType.InlineString, "string"),
+        Tuple.Create(OperandType.InlineVar, "uint"),
+        Tuple.Create(OperandType.ShortInlineVar, "byte"),
+        Tuple.Create(OperandType.InlineVar, "LocalBuilder"),
+        Tuple.Create(OperandType.ShortInlineVar, "LocalBuilder"),
+        Tuple.Create(OperandType.InlineBrTarget, "Label"),
+        Tuple.Create(OperandType.ShortInlineBrTarget, "Label"),
+        Tuple.Create(OperandType.InlineSwitch, "Label[]"),
+        Tuple.Create(OperandType.InlineType, "Type"),
+        Tuple.Create(OperandType.InlineField, "FieldInfo"),
+        Tuple.Create(OperandType.InlineMethod, "MethodInfo"),
+    };
 
-	var objModelOperandTypes = new Dictionary<OperandType, string>
-	{
-		{ OperandType.InlineType, "Type" },
-		{ OperandType.InlineMethod, "MethodInfo" },
-		{ OperandType.InlineField, "FieldInfo" },
-		{ OperandType.InlineString, "string" },
-	};
-	
+    var objModelOperandTypes = new Dictionary<OperandType, string>
+    {
+        { OperandType.InlineType, "Type" },
+        { OperandType.InlineMethod, "MethodInfo" },
+        { OperandType.InlineField, "FieldInfo" },
+        { OperandType.InlineString, "string" },
+    };
 #>
 using System;
 using System.Reflection;
@@ -49,43 +57,65 @@ using System.Reflection.Emit;
 
 namespace FluentIL
 {
-	public partial class FluentILGenerator
-	{
-<# foreach (var opcode in opcodes[OperandType.InlineNone]) { #>
-		public FluentILGenerator <#= opcode.Name #>()
-		{
-			_generator.Emit(OpCodes.<#= opcode.Name #>);
-			return this;
-		}
-<# }#>
-
-<# foreach (var t in primitiveOperandTypes) { #>
-<# foreach (var opcode in opcodes[t.Item1].Where(o => IsPrimitiveOrMacro(o.Code))) { #>
-		public FluentILGenerator <#= opcode.Name #>(<#= t.Item2 #> value)
-		{
-			_generator.Emit(OpCodes.<#= opcode.Name #>, value);
-			return this;
-		}
-<# }#>
-<# }#>
-
-<# foreach (var kvp in objModelOperandTypes) { #>
-<# foreach (var opcode in opcodes[kvp.Key].Where(o => o.Code.OpCodeType == OpCodeType.Objmodel)) { #>
-		public FluentILGenerator <#= opcode.Name #>(<#= kvp.Value #> value)
-		{
-			_generator.Emit(OpCodes.<#= opcode.Name #>, value);
-			return this;
-		}
-<# }#>
-<# }#>
-		
-	}
+<#+ if (isInterface) { #>
+    partial interface IFluentILGenerator
+<#+ } else { #>
+    partial class FluentILGenerator
+<#+ } #>
+    {
+<#+ foreach (var opcode in opcodes[OperandType.InlineNone]) { #>
+<#+     if (isInterface) { #>
+        IFluentILGenerator <#= opcode.Name #>();
+<#+     } else { #>
+        public IFluentILGenerator <#= opcode.Name #>()
+        {
+            _generator.Emit(OpCodes.<#= opcode.Name #>);
+            return this;
+        }
+<#+     } #>
+<#+ }#>
+<#+ foreach (var t in primitiveOperandTypes) { #>
+<#+ foreach (var opcode in opcodes[t.Item1].Where(o => IsPrimitiveOrMacro(o.Code))) { #>
+<#+     if (isInterface) { #>
+        IFluentILGenerator <#= opcode.Name #>(<#= t.Item2 #> value);
+<#+     } else { #>
+        public IFluentILGenerator <#= opcode.Name #>(<#= t.Item2 #> value)
+        {
+            _generator.Emit(OpCodes.<#= opcode.Name #>, value);
+            return this;
+        }
+<#+     } #>
+<#+ }#>
+<#+ }#>
+<#+ foreach (var kvp in objModelOperandTypes) { #>
+<#+ foreach (var opcode in opcodes[kvp.Key].Where(o => o.Code.OpCodeType == OpCodeType.Objmodel)) { #>
+<#+     if (isInterface) { #>
+        IFluentILGenerator <#= opcode.Name #>(<#= kvp.Value #> value);
+<#+     } else { #>
+        public IFluentILGenerator <#= opcode.Name #>(<#= kvp.Value #> value)
+        {
+            _generator.Emit(OpCodes.<#= opcode.Name #>, value);
+            return this;
+        }
+<#+     } #>
+<#+ }#>
+<#+ }#>
+    }
 }
-
+<#+ } #>
 <#+
-	static bool IsPrimitiveOrMacro(OpCode opcode)
-	{
-		return opcode.OpCodeType == OpCodeType.Primitive
-		    || opcode.OpCodeType == OpCodeType.Macro;
-	}
+    static bool IsPrimitiveOrMacro(OpCode opcode)
+    {
+        return opcode.OpCodeType == OpCodeType.Primitive
+            || opcode.OpCodeType == OpCodeType.Macro;
+    }
+
+    void SaveOutput(string outputFileName)
+    {
+        string templateDirectory = Path.GetDirectoryName(Host.TemplateFile);
+        string outputFilePath = Path.Combine(templateDirectory, outputFileName);
+        File.WriteAllText(outputFilePath, this.GenerationEnvironment.ToString()); 
+
+        this.GenerationEnvironment.Remove(0, this.GenerationEnvironment.Length);
+    }
 #>

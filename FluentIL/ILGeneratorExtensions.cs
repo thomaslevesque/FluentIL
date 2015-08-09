@@ -4,7 +4,7 @@ namespace FluentIL
 {
     public static class ILGeneratorExtensions
     {
-        public static FluentILGenerator Fluent(this ILGenerator generator)
+        public static IFluentILGenerator Fluent(this ILGenerator generator)
         {
             return new FluentILGenerator(generator);
         }

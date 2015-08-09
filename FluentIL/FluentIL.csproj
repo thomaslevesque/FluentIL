@@ -43,6 +43,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>FluentILGenerator.Opcodes.tt</DependentUpon>
     </Compile>
+    <Compile Include="IFluentILGenerator.cs" />
+    <Compile Include="IFluentILGenerator.Opcodes.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FluentILGenerator.Opcodes.tt</DependentUpon>
+    </Compile>
     <Compile Include="ILGeneratorExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

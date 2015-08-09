@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace FluentIL
 {
-    public partial class FluentILGenerator
+    public partial class FluentILGenerator : IFluentILGenerator
     {
         private readonly ILGenerator _generator;
 
@@ -22,6 +22,7 @@ namespace FluentIL
             _generator.BeginCatchBlock(exceptionType);
             return this;
         }
+
         public FluentILGenerator BeginExceptFilterBlock()
         {
             _generator.BeginExceptFilterBlock();
