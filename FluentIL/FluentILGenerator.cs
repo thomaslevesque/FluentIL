@@ -7,7 +7,7 @@ using static FluentIL.FormatUtils;
 
 namespace FluentIL
 {
-    partial class FluentILGenerator : IFluentILGenerator
+    public partial class FluentILGenerator : IFluentILGenerator
     {
         private readonly ILGenerator _generator;
         private readonly IILLogger _logger;

@@ -23,7 +23,14 @@ namespace FluentIL
             return $"[{shortAssemblyName}]{type.FullName}";
         }
 
-        public static string FormatMember(MemberInfo member) => $"{FormatType(member.DeclaringType)}.{member.Name}}}";
+        public static string FormatMember(MemberInfo member)
+        {
+            string declaringType =
+                member.DeclaringType != null
+                    ? FormatType(member.DeclaringType)
+                    : "(dynamic)";
+            return $"{FormatType(member.DeclaringType)}.{member.Name}}}";
+        }
 
         public static string FormatLabel(Label label) => $"#{label.GetHashCode()}";
 

@@ -7,7 +7,7 @@ using static FluentIL.FormatUtils;
 
 namespace FluentIL
 {
-    class ILLogger : IILLogger
+    public class ILLogger : IILLogger
     {
         private readonly TextWriter _writer;
 
@@ -101,7 +101,8 @@ namespace FluentIL
 
         private void LogInternal(int offset, OpCode opCode, string operandString, string comment)
         {
-            _writer.WriteLine($"    {FormatOffset(offset)}:  {opCode.Name,-12}{operandString}  // {comment}");
+            string commentWithPrefix = string.IsNullOrEmpty(comment) ? "" : $"  // {comment}";
+            _writer.WriteLine($"    {FormatOffset(offset)}:  {opCode.Name,-12}{operandString}{commentWithPrefix}");
         }
     }
 }
