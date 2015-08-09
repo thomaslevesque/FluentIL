@@ -69,6 +69,7 @@ namespace FluentIL
 <#+     } else { #>
         public IFluentILGenerator <#= opcode.Name #>()
         {
+            _logger?.LogNoOperand(ILOffset, OpCodes.<#= opcode.Name #>);
             _generator.Emit(OpCodes.<#= opcode.Name #>);
             return this;
         }
@@ -81,6 +82,7 @@ namespace FluentIL
 <#+     } else { #>
         public IFluentILGenerator <#= opcode.Name #>(<#= t.Item2 #> value)
         {
+            _logger?.Log(ILOffset, OpCodes.<#= opcode.Name #>, value);
             _generator.Emit(OpCodes.<#= opcode.Name #>, value);
             return this;
         }
@@ -94,6 +96,7 @@ namespace FluentIL
 <#+     } else { #>
         public IFluentILGenerator <#= opcode.Name #>(<#= kvp.Value #> value)
         {
+            _logger?.Log(ILOffset, OpCodes.<#= opcode.Name #>, value);
             _generator.Emit(OpCodes.<#= opcode.Name #>, value);
             return this;
         }

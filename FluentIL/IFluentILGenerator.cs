@@ -8,42 +8,42 @@ namespace FluentIL
 {
     public partial interface IFluentILGenerator
     {
-        FluentILGenerator BeginCatchBlock(Type exceptionType);
-        FluentILGenerator BeginExceptFilterBlock();
-        FluentILGenerator BeginFaultBlock();
-        FluentILGenerator BeginFinallyBlock();
-        FluentILGenerator BeginScope();
-        FluentILGenerator EndScope();
+        IFluentILGenerator BeginCatchBlock(Type exceptionType);
+        IFluentILGenerator BeginExceptFilterBlock();
+        IFluentILGenerator BeginFaultBlock();
+        IFluentILGenerator BeginFinallyBlock();
+        IFluentILGenerator BeginScope();
+        IFluentILGenerator EndScope();
         Label BeginExceptionBlock();
-        FluentILGenerator EndExceptionBlock();
-        FluentILGenerator Call(ConstructorInfo ctor);
+        IFluentILGenerator EndExceptionBlock();
+        IFluentILGenerator Call(ConstructorInfo ctor);
 
-        FluentILGenerator Calli(
+        IFluentILGenerator Calli(
             CallingConventions callingConvention,
             Type returnType,
             Type[] parameterTypes,
             Type[] optionalParameterTypes);
 
-        FluentILGenerator Calli(
+        IFluentILGenerator Calli(
             CallingConvention callingConvention,
             Type returnType,
             Type[] parameterTypes);
 
-        FluentILGenerator CallVarargs(MethodInfo method, Type[] optionalParameterTypes);
-        FluentILGenerator CallvirtVarargs(MethodInfo method, Type[] optionalParameterTypes);
-        FluentILGenerator NewobjVarargs(ConstructorInfo ctor, Type[] optionalParameterTypes);
-        FluentILGenerator CallVarargs(ConstructorInfo ctor, Type[] optionalParameterTypes);
-        FluentILGenerator Unaligned(byte alignment);
-        FluentILGenerator Unaligned(Label alignment);
-        FluentILGenerator Ldtoken(Type type);
-        FluentILGenerator Ldtoken(MethodInfo method);
-        FluentILGenerator Ldtoken(FieldInfo field);
-        FluentILGenerator Constrained(Type type);
-        int ILOffset();
-        FluentILGenerator UsingNamespace(string usingNamespace);
-        FluentILGenerator MarkLabel(Label label);
+        IFluentILGenerator CallVarargs(MethodInfo method, Type[] optionalParameterTypes);
+        IFluentILGenerator CallvirtVarargs(MethodInfo method, Type[] optionalParameterTypes);
+        IFluentILGenerator NewobjVarargs(ConstructorInfo ctor, Type[] optionalParameterTypes);
+        IFluentILGenerator CallVarargs(ConstructorInfo ctor, Type[] optionalParameterTypes);
+        IFluentILGenerator Unaligned(byte alignment);
+        IFluentILGenerator Unaligned(Label alignment);
+        IFluentILGenerator Ldtoken(Type type);
+        IFluentILGenerator Ldtoken(MethodInfo method);
+        IFluentILGenerator Ldtoken(FieldInfo field);
+        IFluentILGenerator Constrained(Type type);
+        int ILOffset { get; }
+        IFluentILGenerator UsingNamespace(string usingNamespace);
+        IFluentILGenerator MarkLabel(Label label);
 
-        FluentILGenerator MarkSequencePoint(
+        IFluentILGenerator MarkSequencePoint(
             ISymbolDocumentWriter document,
             int startLine,
             int startColumn,
@@ -53,8 +53,10 @@ namespace FluentIL
         LocalBuilder DeclareLocal(Type localType);
         LocalBuilder DeclareLocal(Type localType, bool pinned);
         Label DefineLabel();
-        FluentILGenerator WriteLine(FieldInfo field);
-        FluentILGenerator WriteLine(LocalBuilder local);
-        FluentILGenerator WriteLine(string value);
+
+        // Logging not working properly yet
+        //IFluentILGenerator WriteLine(FieldInfo field);
+        //IFluentILGenerator WriteLine(LocalBuilder local);
+        //IFluentILGenerator WriteLine(string value);
     }
 }
